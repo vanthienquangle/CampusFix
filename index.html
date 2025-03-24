@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus-Fix Showcase</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Campus-Fix</h1>
+    <div class="options">
+      <button id="studyArea">Study Area</button>
+      <button id="cookingArea">Cooking Area</button>
+      <button id="elevator">Elevator</button>
+      <button id="room">Room</button>
+    </div>
+
+    <div class="form-container" id="formContainer">
+      <h2 id="formTitle">Report an Issue</h2>
+      <form id="reportForm">
+        <textarea id="issueDescription" placeholder="Describe the issue..." required></textarea>
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+
+    <div class="chatbot-container">
+      <h2>Chatbot</h2>
+      <div id="chatbotMessages"></div>
+      <input type="text" id="chatbotInput" placeholder="Ask a question...">
+      <button id="sendMessage">Send</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
