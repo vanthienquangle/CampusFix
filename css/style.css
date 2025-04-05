@@ -2,6 +2,44 @@
 body {
   font-family: 'Lato', sans-serif;
   color: #040000;
+  cursor: none;
+}
+
+.usf-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  font-size: 24px;
+  color: #fdbb30; /* USF Gold */
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+}
+
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 15px;
+  height: 15px;
+  background-color: #fdbb30; /* USF Gold */
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s ease-out;
+}
+
+.magnetic-btn {
+  position: relative;
+  padding: 12px 24px;
+  font-size: 18px;
+  background: #006747;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+  z-index: 1;
 }
 
 .layout_padding {
