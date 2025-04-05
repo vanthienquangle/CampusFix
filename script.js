@@ -17,22 +17,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   reportForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+  
     const issueDescription = document.getElementById('issueDescription');
-
+    const selectedLocation = document.getElementById('formTitle').textContent.replace("Report ", "").replace(" Issue", "");
+  
+    let issueText = issueDescription.value;
+  
+    // STEP 1: Get AI description from image if uploaded
     if (imageUpload.files.length > 0) {
       const formData = new FormData();
       formData.append('image', imageUpload.files[0]);
-
+  
       try {
         const response = await fetch('http://127.0.0.1:5000/image-report', {
           method: 'POST',
           body: formData
         });
-
+  
         const data = await response.json();
         if (data.description) {
-          issueDescription.value = data.description;
-          alert(`AI-detected issue: ${data.description}`);
+          issueText = data.description;
+          issueDescription.value = issueText;
+          alert(`🧠 AI-detected issue: ${issueText}`);
         } else {
           alert('Could not classify the issue using AI.');
         }
@@ -40,13 +46,35 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Image classification error:', error);
         alert('Something went wrong while analyzing the image.');
       }
-    } else {
-      alert(`Issue reported: ${issueDescription.value}`);
     }
-
+  
+    // STEP 2: This is where you put the emailResponse fetch:
+    try {
+      const emailResponse = await fetch('http://127.0.0.1:5000/email-with-ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          issue: issueText,
+          location: selectedLocation
+        })
+      });
+  
+      const emailResult = await emailResponse.json();
+  
+      if (emailResult.status) {
+        alert("Email sent successfully!\n\n📧 AI-written message:\n\n" + emailResult.email_body);
+      } else {
+        alert("Failed to send email.");
+      }
+    } catch (error) {
+      console.error('Email send error:', error);
+      alert('Something went wrong while sending the email.');
+    }
+  
     reportForm.reset();
     formContainer.style.display = 'none';
   });
+  
 
   sendMessageButton.addEventListener('click', async () => {
     const message = chatbotInput.value;
