@@ -5,7 +5,31 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Upload Image</title>
+  <style>
+    body {
+      background-image: url('assets/campus.png');
+      background-size: cover;           /* scales image to fill screen */
+      background-repeat: no-repeat;     /* prevents tiling */
+      background-position: center;      /* centers the image */
+      background-attachment: fixed;     /* optional: keeps image in place while scrolling */
+    }
+    body::before{
+      content: "";
+      position: fixed; /* Cover the entire viewport */
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(128, 128, 128, 0.6); /* Gray with 50% opacity */
+      z-index: 1; /* Place the mask above the background image */
+    }
+    body > * {
+      position: relative; /* Create a stacking context for children */
+      z-index: 2; /* Place main content above the mask */
+    }
+  </style>
 </head>
+
 <body style="display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background-color: #f8f8f8; font-family: 'Segoe UI', sans-serif;">
 
   <form style="display: flex; flex-direction: column; gap: 15px; width: 90%; max-width: 600px; padding: 30px; background-color: #ffffff; border: 2px solid #006747; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); align-items: center;">
@@ -15,7 +39,7 @@
     <div style="display: flex; gap: 10px; width: 100%;">
       <div style="display: flex; flex-direction: row; align-items: flex-start; gap: 10px; width: 50%;">
         <label for="building">Building:</label>
-        <input type="text" id="building" placeholder="Example: LIB, MSC..."/>
+        <input type="text" id="building" placeholder="Example: LIB, MSC..." required/>
       </div>
       <div style="display: flex; flex-direction: row; align-items: flex-end; justify-content: flex-end; gap: 10px; width: 50%;">
         <label for="specificLocation">Floor/Room:</label>
@@ -35,12 +59,14 @@
       <label for="checkbox" style="font-size: 14px;">Is this the image you want to submit?</label>
     </div>
 
-    <input type="submit" id="submitBtn" value="Submit"
+    <button type="submit" id="submitBtn"
       style="width: 100%; padding: 12px; font-weight: bold; font-size: 16px; border: 2px solid #006747; border-radius: 6px; 
       cursor: pointer; transition: all 0.3s ease;" 
       onmouseover="this.style.backgroundColor='white'; this.style.color='#006747';"
       onmouseout="this.style.backgroundColor='#006747'; this.style.color='white';"
-      disabled />
+      disabled>
+      Submit
+    </button>
   </form>
 
   <script>
