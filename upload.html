@@ -36,7 +36,11 @@
     </div>
 
     <input type="submit" id="submitBtn" value="Submit"
-      style="width: 100%; padding: 12px; background-color: #006747; color: white; font-weight: bold; font-size: 16px; border: none; border-radius: 6px; cursor: pointer;" disabled />
+      style="width: 100%; padding: 12px; font-weight: bold; font-size: 16px; border: 2px solid #006747; border-radius: 6px; 
+      cursor: pointer; transition: all 0.3s ease;" 
+      onmouseover="this.style.backgroundColor='white'; this.style.color='#006747';"
+      onmouseout="this.style.backgroundColor='#006747'; this.style.color='white';"
+      disabled />
   </form>
 
   <script>
