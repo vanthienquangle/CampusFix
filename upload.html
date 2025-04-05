@@ -1,65 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Image</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload Image</title>
 </head>
-<body>
-    <form style="display: flex; flex-direction: column; gap: 5px; width: 750px; height: fit-content;
-    align-items: center; border: 1px black solid">
-        <input type="file" id="inputImage" accept="image/*" style="width: 90%; margin: 5%;">
-        <div class="image-box" style="width: 90%; margin: 5%;">
-            <img id="displayedImage" src="#" width="100%" height="100%">
-        </div>
-        
-        <div style="display: flex; flex-direction: row;">
-            <input type="checkbox" id="checkbox" disabled>
-            <text>Is this the image you want to submit?</text>
-        </div>
-        
-        <input type="submit" id="submitBtn" style="width: 90%; margin: 5%;" disabled>
-    </form>
+<body style="display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background-color: #f8f8f8; font-family: 'Segoe UI', sans-serif;">
 
-    <script>
-        const inputImage = document.getElementById("inputImage");
-        const displayedImage = document.getElementById("displayedImage")
-        const imageBox = document.querySelector(".image-box")
-        const submitBtn = document.getElementById("submitBtn")
-        const checkbox = document.getElementById("checkbox")
+  <form style="display: flex; flex-direction: column; gap: 15px; width: 90%; max-width: 600px; padding: 30px; background-color: #ffffff; border: 2px solid #006747; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); align-items: center;">
+    
+    <h2 style="color: #006747; margin-bottom: 10px;">Upload a Photo</h2>
 
-        inputImage.addEventListener('change', function() {
-            const file = this.files[0]
-            if (file) {
-                const reader = new FileReader();
-                reader.addEventListener('load', function() {
-                    displayedImage.src = this.result;
-                });
-                reader.readAsDataURL(file);
-                checkbox.disabled = false;
-            }else{
-                checkbox.disabled = false;
-                displayedImage.src = "#"; // Clear the image if no file is selected
-            }
-        });
+    <input type="file" id="inputImage" accept="image/*" 
+      style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;"/>
 
-        checkbox.addEventListener('change', function(){
-            if (this.checked){
-                submitBtn.disabled = false;
-            }else{
-                submitBtn.disabled = true;
-            }
-        })
-    </script>
+    <div class="image-box" style="width: 100%; max-height: 400px; overflow: hidden; border: 1px solid #ddd; border-radius: 6px;">
+      <img id="displayedImage" src="#" style="width: 100%; height: auto; object-fit: contain; display: none;" />
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <input type="checkbox" id="checkbox" disabled />
+      <label for="checkbox" style="font-size: 14px;">Is this the image you want to submit?</label>
+    </div>
+
+    <input type="submit" id="submitBtn" value="Submit"
+      style="width: 100%; padding: 12px; background-color: #006747; color: white; font-weight: bold; font-size: 16px; border: none; border-radius: 6px; cursor: pointer;" disabled />
+  </form>
+
+  <script>
+    const inputImage = document.getElementById("inputImage");
+    const displayedImage = document.getElementById("displayedImage");
+    const checkbox = document.getElementById("checkbox");
+    const submitBtn = document.getElementById("submitBtn");
+
+    inputImage.addEventListener("change", function () {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function () {
+          displayedImage.src = reader.result;
+          displayedImage.style.display = "block";
+          checkbox.disabled = false;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        displayedImage.src = "#";
+        displayedImage.style.display = "none";
+        checkbox.disabled = true;
+        submitBtn.disabled = true;
+        checkbox.checked = false;
+      }
+    });
+
+    checkbox.addEventListener("change", function () {
+      submitBtn.disabled = !this.checked;
+    });
+  </script>
 </body>
 </html>

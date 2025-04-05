@@ -25,10 +25,32 @@
   <link href="css/style.css" rel="stylesheet" />
   <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
-
+  <script src="https://kit.fontawesome.com/3ea7dea4dc.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
+
+  <!-- <div class="cursor-dot"></div> -->
+  <i class="fa-regular fa-hand-pointer usf-cursor"></i>
+  <script>
+    const cursor = document.querySelector('.usf-cursor');
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.top = e.clientY + 'px';
+      cursor.style.left = e.clientX + 'px';
+    });
+  </script>
+  
+
+  <script>
+    const cursorDot = document.querySelector('.cursor-dot');
+  
+    document.addEventListener('mousemove', e => {
+      cursorDot.style.top = e.clientY + 'px';
+      cursorDot.style.left = e.clientX + 'px';
+    });
+  </script>
+  
+
   <div class="hero_area">
     <!-- header section strats -->
     <header class="header_section">
@@ -102,19 +124,47 @@
                 Just snap a photo—CampusFix sends it to the right department for a quick fix.
 No forms. No hassle. Just simple, smart repairs.
               </p>
-              <a href="">
+              <a href="upload.html" class="magnetic-btn">
                 Get Started
               </a>
             </div>
           </div>
           <div class="col-md-6">
             <div class="img-box">
-              <img src="images/Apr 5, 2025, 01_06_06 PM.png" alt="">
+              <img src="images/guy_ok.png" alt="">
             </div>
           </div>
         </div>
       </div>
-    </section>
+  </section>
+
+  <script>
+    const btn = document.querySelector('.magnetic-btn');
+  
+    document.addEventListener('mousemove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+  
+      btn.style.transform = `translate(${x * 0.1}px, ${y * 0.1}px)`;
+    });
+  
+    document.addEventListener('mouseleave', () => {
+      btn.style.transform = 'translate(0, 0)';
+    });
+  </script>
+
+  <!-- <script>
+    function changeImage(path) {
+      const img = document.getElementById("heroImage");
+      img.src = path;
+  
+      // Optional: In case the image fails to load, fallback
+      img.onerror = () => {
+        img.src = "images/guy_smile.png";
+      };
+    }
+  </script> -->
     <!-- end slider section -->
   </div>
 
