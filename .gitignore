@@ -1,4 +1,3 @@
-.env
 *.jpg
-sending_email.py
-composeMail.py
+
+.env
