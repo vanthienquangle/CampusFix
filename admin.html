@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard - CampusFix</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #fdfbfb, #ebedee);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 50px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 12px 20px;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background: linear-gradient(to right, #0072ff, #00c6ff);
+      transform: translateY(-2px);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .category-section {
+      margin-top: 30px;
+      border-left: 5px solid #007bff;
+      padding-left: 15px;
+    }
+
+    .category-section h3 {
+      color: #007bff;
+      text-transform: uppercase;
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+
+    .report-card {
+      background: #f7f9fa;
+      border: 1px solid #ddd;
+      padding: 16px;
+      margin: 10px 0;
+      border-radius: 10px;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease;
+    }
+
+    .report-card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+    }
+
+    .report-card p {
+      margin: 5px 0;
+    }
+
+    .report-card button {
+      margin-top: 10px;
+      background: linear-gradient(to right, #28a745, #218838);
+    }
+
+    .report-card.finished {
+      background: #d4edda;
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+
+    .icon {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+
+    .electrician-icon { background-color: #ffb74d; }
+    .maintenance-icon { background-color: #4fc3f7; }
+    .plumber-icon { background-color: #81c784; }
+    .health-icon { background-color: #f48fb1; }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>CampusFix Admin Panel</h1>
+    <input type="email" id="adminEmail" placeholder="Email">
+    <input type="password" id="adminPassword" placeholder="Password">
+    <button onclick="login()">Login</button>
+
+    <div id="adminPanel" class="hidden">
+      <h2 style="text-align:center; margin-top: 30px;">Incoming Reports</h2>
+      <div id="sectionsContainer"></div>
+    </div>
+  </div>
+
+  <script>
+    async function login() {
+      const email = document.getElementById('adminEmail').value;
+      const password = document.getElementById('adminPassword').value;
+
+      try {
+        const res = await fetch('http://127.0.0.1:5000/admin-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: email, password })
+        });
+
+        const result = await res.json();
+        if (result.success) {
+          document.getElementById('adminPanel').classList.remove('hidden');
+          document.getElementById('adminEmail').style.display = 'none';
+          document.getElementById('adminPassword').style.display = 'none';
+          document.querySelector('button').style.display = 'none';
+          loadReports();
+        } else {
+          alert('❌ Login failed! Please check credentials.');
+        }
+      } catch (error) {
+        alert('⚠️ Cannot connect to server. Please ensure Flask backend is running.');
+        console.error(error);
+      }
+    }
+
+    async function loadReports() {
+      const res = await fetch('http://127.0.0.1:5000/api/reports');
+      const reports = await res.json();
+
+      const grouped = {
+        electrician: [],
+        maintenance: [],
+        plumber: [],
+        health: []
+      };
+
+      reports.forEach(r => {
+        if (!r.finished) grouped[r.category]?.push(r);
+      });
+
+      const container = document.getElementById('sectionsContainer');
+      container.innerHTML = '';
+
+      for (const [category, list] of Object.entries(grouped)) {
+        const section = document.createElement('div');
+        section.classList.add('category-section');
+
+        const colorClass = `${category}-icon`;
+        section.innerHTML = `
+          <div class="section-title">
+            <div class="icon ${colorClass}"></div>
+            <h3>${category.toUpperCase()}</h3>
+          </div>
+        `;
+
+        list.forEach(report => {
+          const div = document.createElement('div');
+          div.classList.add('report-card');
+          div.innerHTML = `
+            <p><strong>📍 Location:</strong> ${report.location}</p>
+            <p><strong>📝 Issue:</strong> ${report.description}</p>
+            <button onclick="markFinished(${report.id}, this)">✅ Mark as Finished</button>
+          `;
+          section.appendChild(div);
+        });
+
+        container.appendChild(section);
+      }
+    }
+
+    async function markFinished(id, btn) {
+      await fetch(`http://127.0.0.1:5000/api/finish/${id}`, {
+        method: 'POST'
+      });
+      btn.closest('.report-card').classList.add('finished');
+      btn.remove(); // Remove the button once marked
+    }
+  </script>
+</body>
+</html>
