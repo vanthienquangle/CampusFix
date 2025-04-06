@@ -98,5 +98,26 @@
       submitBtn.disabled = !this.checked;
     });
   </script>
+
+<script>
+  const form = document.querySelector("form");
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault(); // Prevent form from actually submitting
+
+    const building = document.getElementById("building").value;
+    const room = document.getElementById("specificLocation").value;
+    const imageInput = document.getElementById("inputImage");
+    const imageFile = imageInput.files[0];
+
+    const submission = {
+      building: building,
+      room: room,
+      imageFile: imageFile
+    };
+
+    console.log(submission); // 💥 View in console
+  });
+</script>
 </body>
 </html>
