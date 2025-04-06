@@ -105,34 +105,38 @@ def send_email():
     if 'image' not in request.files:
         return jsonify({"error": "No image part in the request"}), 400
     image = request.files["image"]
+    bytes = image.read()
+    imgAttach = MIMEImage(bytes, _subtype = "jpg")
     if not image:
         raise ValueError("No image file found in the request.")
-    image = Image.open(BytesIO(image.read()))
+    image = Image.open(BytesIO(bytes))
     
     building = request.form["building"]
-    room = request.form["room"]
+    room = "" if not request.form["room"].strip() else f", room {request.form["room"]}"
 
     model = genai.GenerativeModel("gemini-1.5-flash")
 
     problemMessage = model.generate_content([
-        "Describe the problem identified in the provided image but state it out as a part of an inquiry email not a structure of an email without any value placeholder",
+        "Describe the issue in this image for a maintenance report from the perspective of a user reporting the issue in the picture for maintainance request. Don't use any placeholders for any values. Don't make it email format, just simple description of the issue. No new line before or after response text.",
         image
     ]).text
 
     recipient = find_contact_by_issue(problemMessage)
 
     subject = model.generate_content([
-        "Write a subject of the maintainence inquiry email on one single line",
+        "Write a subject of the maintainence inquiry email on one single line, don't include any placeholders for any values. No new line before or after response text.",
         image
     ]).text
 
     # Set up the email parameters
     sender_email = "campusfixusf@gmail.com"
-    receiver_email = "xinchaotoilaphuc1309@gmail.com" # recipient.email
+    receiver_email = recipient["email"] # recipient.email
+    print(recipient)
     body = f'''
     Dear {recipient["name"]},
 
-    The following problem is recently reported at {building}, room {room}:
+    The following problem is recently reported at {building}{room}:
+
     {problemMessage}
 
     Please kindly help sort it out as soon as possible. Thank you for your assistance!
@@ -146,6 +150,7 @@ def send_email():
     message["To"] = receiver_email
     message["Subject"] = subject
     message.attach(MIMEText(body, "plain"))
+    message.attach(imgAttach)
 
     if recipient is None:
         os.alert("No recipient is found for this issue")
