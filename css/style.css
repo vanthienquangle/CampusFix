@@ -5,6 +5,65 @@ body {
   cursor: none;
 }
 
+/* Logo sizing and spacing */
+.navbar-brand img {
+  height: 50px;
+}
+
+.navbar-nav .nav-link {
+  color: #006747;
+  font-weight: 500;
+  padding: 8px 16px;
+  transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #fdbb30; /* USF Gold */
+}
+
+/* Optional: Remove default toggler background */
+.navbar-toggler {
+  border: none;
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' ... %3C/svg%3E");
+}
+
+
+
+.slider_section {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* USF Background Logo */
+.usf-logo-bg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 700px;
+  height: 700px;
+  background-image: url(/CampusFix/images/usf-bull.png); /* fixed */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.05;
+  filter: blur(0.1px);
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .usf-logo-bg {
+    width: 300px;
+    height: 300px;
+    filter: blur(2px);
+  }
+}
+
 .usf-cursor {
   position: fixed;
   top: 0;
@@ -335,13 +394,14 @@ a:focus {
 
 .slider_section .detail-box h1 {
   font-weight: bold;
+  font-size: 45px;
   margin-bottom: 25px;
   color: #006747;
 }
 
 .slider_section .detail-box p {
   color: #444;
-  font-size: 15px;
+  font-size: 30px;
 }
 
 .slider_section .detail-box a {

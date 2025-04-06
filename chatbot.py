@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 from PIL import Image
 import google.generativeai as genai
@@ -35,12 +35,32 @@ EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 
+REPORTS = []
+
 # Configure Gemini
 genai.configure(api_key=GEMINI_API_KEY)
 
 @app.route('/')
 def home():
     return "Flask server is running!"
+
+@app.route('/admin-login', methods=['POST'])
+def admin_login():
+    creds = request.get_json()
+    if creds['username'] == 'campusfixusf@gmail.com' and creds['password'] == 'campusfixiswinningthishackathon040525':
+        return jsonify(success=True)
+    return jsonify(success=False)
+
+@app.route('/api/reports')
+def get_reports():
+    return jsonify(REPORTS)
+
+@app.route('/api/finish/<int:report_id>', methods=['POST'])
+def mark_finished(report_id):
+    for r in REPORTS:
+        if r['id'] == report_id:
+            r['finished'] = True
+    return jsonify(success=True)
 
 # Chat with Gemini
 @app.route('/chat', methods=['POST'])
