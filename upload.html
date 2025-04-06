@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="chatbot.py">
   <title>Upload Image</title>
   <style>
     body {
@@ -70,12 +71,12 @@
   </form>
 
   <script>
-    const inputImage = document.getElementById("inputImage");
+    const inputImg = document.getElementById("inputImage");
     const displayedImage = document.getElementById("displayedImage");
     const checkbox = document.getElementById("checkbox");
     const submitBtn = document.getElementById("submitBtn");
 
-    inputImage.addEventListener("change", function () {
+    inputImg.addEventListener("change", function() {
       const file = this.files[0];
       if (file) {
         const reader = new FileReader();
@@ -97,6 +98,49 @@
     checkbox.addEventListener("change", function () {
       submitBtn.disabled = !this.checked;
     });
+
+    const form = document.querySelector("form");
+    const imageFile = inputImg.files[0];
+    const building = document.getElementById("building").value;
+    const room = document.getElementById("specificLocation").value;
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault(); // Prevent form from actually submitting
+
+      // Get the latest values of the inputs when the submit button is clicked
+      const imageFile = inputImg.files[0];  // Get the image after user selects it
+      const building = document.getElementById("building").value;
+      const room = document.getElementById("specificLocation").value;
+
+      if (!imageFile) {
+        alert('Please select an image!');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('image', imageFile);
+      formData.append('building', building);
+      formData.append('room', room);
+
+      try {
+        const emailResponse = await fetch('http://127.0.0.1:5000/email-with-ai', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!emailResponse.ok) {
+          const errorText = await emailResponse.text();
+          throw new Error(`Server returned an error: ${errorText}`);
+        }
+
+        const result = await emailResponse.text();
+        alert(result);
+      } catch (error) {
+        console.error('Email failed:', error);
+        alert(error);
+      }
+    });
+    
   </script>
 
 <script>

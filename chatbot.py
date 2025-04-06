@@ -4,10 +4,29 @@ from PIL import Image
 import google.generativeai as genai
 import smtplib
 from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 import json
 import os
 from dotenv import load_dotenv
+from io import BytesIO
+
+# Init Flask
+app = Flask(__name__)
+CORS(app)
+
+# Load contact responsibilities
+with open('contacts.json') as f:
+    CONTACTS = json.load(f)
+
+# Select the responsible contact based on keywords
+def find_contact_by_issue(issue_text):
+    issue_lower = issue_text.lower()
+    for role, info in CONTACTS.items():
+        for keyword in info["keywords"]:
+            if keyword in issue_lower:
+                return info  # {name, email, keywords}
+    return None
 
 # Load environment variables (EMAIL + GEMINI API)
 load_dotenv()
@@ -15,18 +34,11 @@ EMAIL_SENDER = os.getenv("EMAIL_SENDER")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-# Load contact responsibilities
-with open('contacts.json') as f:
-    CONTACTS = json.load(f)
 
 REPORTS = []
 
 # Configure Gemini
 genai.configure(api_key=GEMINI_API_KEY)
-
-# Init Flask
-app = Flask(__name__)
-CORS(app)
 
 @app.route('/')
 def home():
@@ -87,81 +99,77 @@ def image_report():
 
 # AI writes + sends email to proper contact
 @app.route('/email-with-ai', methods=['POST'])
-def email_with_ai():
-    data = request.get_json()
-    raw_issue = data.get("issue", "")
-    location = data.get("location", "Unknown Area")
-
-    if not raw_issue:
-        return jsonify({"error": "Missing issue"}), 400
-
-    try:
-        # AI writes the message
-        model = genai.GenerativeModel('gemini-pro')
-        prompt = f"""Write a professional maintenance request email based on the following report:
-Location: {location}
-Issue: {raw_issue}
-Make sure it's polite and clear."""
-        response = model.generate_content(prompt)
-        email_body = response.text
-
-        # Auto-select the recipient
-        contact = find_contact_by_issue(raw_issue)
-        if not contact:
-            return jsonify({"error": "No responsible individual found"}), 400
-
-        subject = f"Campus Maintenance Issue - {location}"
-        email_sent = send_email(subject, email_body, recipient=contact["email"])
-
-        if email_sent:
-            # Save to admin dashboard list
-            REPORTS.append({
-                "id": len(REPORTS) + 1,
-                "category": contact["role"],   # Ensure 'role' field exists in contacts.json
-                "description": raw_issue,
-                "location": location,
-                "finished": False
-            })
-            return jsonify({
-                "status": "Email sent successfully",
-                "email_body": email_body,
-                "recipient": contact["name"]
-            })
-        else:
-            return jsonify({"error": "Failed to send email"}), 500
-
-    except Exception as e:
-        print("AI Email Generation Error:", e)
-        return jsonify({"error": "Failed to generate or send email"}), 500
-
-
-# Select the responsible contact based on keywords
-def find_contact_by_issue(issue_text):
-    issue_lower = issue_text.lower()
-    for role, info in CONTACTS.items():
-        for keyword in info["keywords"]:
-            if keyword in issue_lower:
-                return info  # {name, email, keywords}
-    return None
-
 # Send email using Gmail SMTP
-def send_email(subject, body, recipient):
-    msg = MIMEMultipart()
-    msg['From'] = EMAIL_SENDER
-    msg['To'] = recipient
-    msg['Subject'] = subject
-    msg.attach(MIMEText(body, 'plain'))
+def send_email():
+    # Generate text from the image
+    if 'image' not in request.files:
+        return jsonify({"error": "No image part in the request"}), 400
+    image = request.files["image"]
+    if not image:
+        raise ValueError("No image file found in the request.")
+    image = Image.open(BytesIO(image.read()))
+    
+    building = request.form["building"]
+    room = request.form["room"]
+
+    model = genai.GenerativeModel("gemini-1.5-flash")
+
+    problemMessage = model.generate_content([
+        "Describe the problem identified in the provided image but state it out as a part of an inquiry email not a structure of an email without any value placeholder",
+        image
+    ]).text
+
+    recipient = find_contact_by_issue(problemMessage)
+
+    subject = model.generate_content([
+        "Write a subject of the maintainence inquiry email on one single line",
+        image
+    ]).text
+
+    # Set up the email parameters
+    sender_email = "campusfixusf@gmail.com"
+    receiver_email = "xinchaotoilaphuc1309@gmail.com" # recipient.email
+    body = f'''
+    Dear {recipient["name"]},
+
+    The following problem is recently reported at {building}, room {room}:
+    {problemMessage}
+
+    Please kindly help sort it out as soon as possible. Thank you for your assistance!
+
+    Best regards,
+    CampusFix Team
+    '''
+    # Create the message
+    message = MIMEMultipart()
+    message["From"] = sender_email
+    message["To"] = receiver_email
+    message["Subject"] = subject
+    message.attach(MIMEText(body, "plain"))
+
+    if recipient is None:
+        os.alert("No recipient is found for this issue")
+
+    # Set up the SMTP server
+    smtp_server = "smtp.gmail.com"
+    smtp_port = 587
+    smtp_user = sender_email
+    smtp_password = "cnki qxnw eqlg iaex"  # For Gmail, use App Password if 2FA is enabled
 
     try:
-        server = smtplib.SMTP("smtp.gmail.com", 587)
-        server.starttls()
-        server.login(EMAIL_SENDER, EMAIL_PASSWORD)
-        server.sendmail(EMAIL_SENDER, recipient, msg.as_string())
-        server.quit()
-        return True
+        # Connect to the server and send the email
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()  # Secure the connection
+            server.login(smtp_user, smtp_password)  # Login
+            server.sendmail(sender_email, receiver_email, message.as_string())  # Send the email
+
+        print("Email sent successfully!")
+        return "Successfully sent"
     except Exception as e:
-        print("Email error:", e)
-        return False
+        import traceback
+        traceback.print_exc()  # 👈 this prints full stack trace to your terminal
+        return f"Failed: {str(e)}", 500  # 👈 this sends the error back to your fetch
+
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    app.run(debug=True, port=5000)
