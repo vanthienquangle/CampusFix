@@ -1,8 +1,9 @@
+# Testing generative purpose
 import google.generativeai as genai
 import json
 from PIL import Image
 
-genai.configure(api_key="AIzaSyDQa8b4K1Wcpc3OhpXBtGDgym5eXJgtPOY")
+genai.configure(api_key="")
 
 image = Image.open("IMG_3686.jpg")
 
