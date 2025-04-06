@@ -1,23 +1,27 @@
 {
-    "plumber": {
-      "name": "John the Plumber",
-      "email": "plumber@example.com",
-      "keywords": ["leak", "pipe", "water", "drain"]
-    },
     "electrician": {
-      "name": "Ella the Electrician",
-      "email": "electrician@example.com",
-      "keywords": ["power", "electricity", "light", "socket", "outlet"]
+      "name": "Electrician Team",
+      "email": "electrician@campusfix.com",
+      "keywords": ["light", "electric", "power", "socket"],
+      "role": "electrician"
     },
     "maintenance": {
-      "name": "Mike the Maintenance Guy",
-      "email": "maintenance@example.com",
-      "keywords": ["broken", "door", "floor", "window"]
+      "name": "Maintenance Crew",
+      "email": "maintenance@campusfix.com",
+      "keywords": ["door", "broken", "window", "wall", "floor"],
+      "role": "maintenance"
     },
-    "emergency": {
-      "name": "Nurse Joy",
-      "email": "nurse@example.com",
-      "keywords": ["injury", "blood", "fall", "emergency", "sick"]
+    "plumber": {
+      "name": "Plumber Team",
+      "email": "plumber@campusfix.com",
+      "keywords": ["leak", "pipe", "toilet", "sink"],
+      "role": "plumber"
+    },
+    "health": {
+      "name": "Health Office",
+      "email": "health@campusfix.com",
+      "keywords": ["hazard", "bio", "infection", "smell", "clean"],
+      "role": "health"
     }
   }
   

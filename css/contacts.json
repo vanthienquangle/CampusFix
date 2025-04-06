@@ -1,0 +1,26 @@
+{
+  "plumber": {
+    "name": "John the Plumber",
+    "email": "kautiluaveer24@gmail.com",
+    "keywords": ["leak", "pipe", "water", "drain"],
+    "role": "plumber"
+  },
+  "electrician": {
+    "name": "Ella the Electrician",
+    "email": "levanthienquang@gmail.com",
+    "keywords": ["power", "electricity", "light", "socket", "outlet"],
+    "role": "electrician"
+  },
+  "maintenance": {
+    "name": "Mike the Maintenance Guy",
+    "email": "xinchaotoilaphuc1309@gmail.com",
+    "keywords": ["broken", "door", "floor", "window"],
+    "role": "maintenance"
+  },
+  "emergency": {
+    "name": "Nurse Joy",
+    "email": "brian.dungho@gmail.com",
+    "keywords": ["injury", "blood", "fall", "emergency", "sick"],
+    "role": "emergency"
+  }
+}
