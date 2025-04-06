@@ -1,4 +1,5 @@
 import google.generativeai as genai
+import json
 from PIL import Image
 
 genai.configure(api_key="AIzaSyDQa8b4K1Wcpc3OhpXBtGDgym5eXJgtPOY")
@@ -12,4 +13,17 @@ response = model.generate_content([
     image
 ])
 
+# Load contact responsibilities
+with open('contacts.json') as f:
+    CONTACTS = json.load(f)
+
+def find_contact_by_issue(issue_text):
+    issue_lower = issue_text.lower()
+    for role, info in CONTACTS.items():
+        for keyword in info["keywords"]:
+            if keyword in issue_lower:
+                return info  # {name, email, keywords}
+    return None
+
 print(response.text)
+print(find_contact_by_issue(response.text)["name"])

@@ -1,12 +1,40 @@
+import google.generativeai as genai
+from PIL import Image
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+# Generate text from the image
+genai.configure(api_key="AIzaSyDQa8b4K1Wcpc3OhpXBtGDgym5eXJgtPOY")
+
+image = Image.open("image.jpg")
+
+model = genai.GenerativeModel("gemini-1.5-flash")
+
+problemMessage = model.generate_content([
+    "Describe the problem identified in the provided image",
+    image
+]).text
+
+subject = mode.generate_content([
+    "We are writing an email to the maintainance team for the problem in the image. Create an email subject about it with the structure: 'Inquiry of (problem)'",
+    image
+])
+
 # Set up the email parameters
 sender_email = "campusfixusf@gmail.com"
 receiver_email = "kautilyaveer24@gmail.com"
-subject = "Enter Subject"
-body = "Enter Body"
+body = f'''
+Dear (receiver),
+
+The following problem is recently reported at (building), room (room):
+{problemMessage}
+
+Please kindly help sort it out as soon as possible. Thank you for your assistance!
+
+Best regards,
+CampusFix Team
+'''
 
 # Create the message
 message = MIMEMultipart()
