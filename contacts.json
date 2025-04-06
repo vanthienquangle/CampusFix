@@ -14,7 +14,7 @@
       "email": "maintenance@example.com",
       "keywords": ["broken", "door", "floor", "window"]
     },
-    "emergency": {
+    "health": {
       "name": "Nurse Joy",
       "email": "nurse@example.com",
       "keywords": ["injury", "blood", "fall", "emergency", "sick"]
