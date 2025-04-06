@@ -5,7 +5,7 @@ from PIL import Image
 
 genai.configure(api_key="")
 
-image = Image.open("IMG_3686.jpg")
+image = Image.open("faucet.jpg")
 
 model = genai.GenerativeModel("gemini-1.5-flash")
 
